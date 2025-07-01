@@ -56,7 +56,7 @@ int terminal_init(){
 int terminal_done(){
     return disableRawMode();
 }
-int cursor(int a){
+int cursor(int a,struct file_cursor *f_cursor){
     struct winsize size;
     switch (a)
     {
@@ -64,24 +64,32 @@ int cursor(int a){
         case 13:  printf("\n");break;
         case 53:
             ioctl(STDIN_FILENO,TIOCGWINSZ,&size);
-            printf("\033[%dD\033[%dA",size.ws_col,size.ws_row);
+            printf("\033[%dD\033[%dB",size.ws_col,size.ws_row);
+            f_cursor->col+=size.ws_col;
+            if (f_cursor->row<0){
+                f_cursor->row=0;
+            }
+            f_cursor->row-=size.ws_col;
             break;
         case 54:   
             ioctl(STDIN_FILENO,TIOCGWINSZ,&size);
             printf("\033[%dD\033[%dB",size.ws_col,size.ws_row);
+            f_cursor->col+=size.ws_col;
+            f_cursor->row+=size.ws_col;
             break;
-        case 65:  printf("\033[A"); break;
-        case 66:  printf("\033[B"); break;
-        case 67:  printf("\033[C"); break;
-        case 68:  printf("\033[D"); break;
+        case 65:  printf("\033[A"); f_cursor->row--;break;
+        case 66:  printf("\033[B"); f_cursor->row++;break;
+        case 67:  printf("\033[C"); f_cursor->col++;break;
+        case 68:  printf("\033[D"); f_cursor->col--;break;
         case 70:
             ioctl(STDIN_FILENO,TIOCGWINSZ,&size);
             printf("\033[%dC",size.ws_col-size.ws_xpixel);
+            f_cursor->col=size.ws_col-size.ws_xpixel;
             break;
-        case 72:  printf("\033[G");break;
+        case 72:  printf("\033[G");f_cursor->col=0;break;
         case 27: break;
         case 91: break;
-        case 127: break;
+        case 127: printf("\033[D"); break;
         default:
         break;
     }
