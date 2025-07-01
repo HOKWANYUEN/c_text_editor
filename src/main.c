@@ -8,7 +8,7 @@ int main(){
         printf("\nerror!");
         return 0;
     }
-    display();
+    editor_display();
     editor_done();
     return 0;
 }

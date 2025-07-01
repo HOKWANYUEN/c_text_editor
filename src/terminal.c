@@ -81,7 +81,7 @@ int cursor(int a){
         case 72:  printf("\033[G");break;
         case 27: break;
         case 91: break;
-        case 128: printf("BACK");break;
+        case 127: break;
         default:
         break;
     }
